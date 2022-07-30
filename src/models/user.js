@@ -39,6 +39,24 @@ const userSchema = mongoose.Schema(
         ref: "Conversation",
       },
     ],
+    messages: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Message",
+      },
+    ],
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     emailVerifyToken: String,
     passwordResetToken: String,
     refreshToken: {

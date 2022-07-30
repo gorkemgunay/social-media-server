@@ -10,6 +10,7 @@ const userRoute = require("./routes/user");
 const messageRoute = require("./routes/message");
 const conversationRoute = require("./routes/conversation");
 const commentRoute = require("./routes/comment");
+const followRoute = require("./routes/follow");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -34,6 +35,7 @@ app.use("/user", userRoute);
 app.use("/message", messageRoute);
 app.use("/conversation", conversationRoute);
 app.use("/comment", commentRoute);
+app.use("/follow", followRoute);
 
 let users = [];
 
@@ -82,6 +84,14 @@ io.on("connection", (socket) => {
 
   socket.on("registeredUser", async (data) => {
     io.emit("getRegisteredUser", data);
+  });
+
+  socket.on("followUser", async (data) => {
+    io.emit("getFollower", data);
+  });
+
+  socket.on("unfollowUser", async (data) => {
+    io.emit("getUnfollower", data);
   });
 
   socket.on("disconnect", () => {

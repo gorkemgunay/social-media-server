@@ -18,7 +18,10 @@ const getUsers = async (req, res) => {
 const getUser = async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await User.findById(userId).populate("posts");
+    const user = await User.findById(userId)
+      .populate("posts")
+      .populate("followers")
+      .populate("following");
     return res.send(user);
   } catch (error) {
     return res.send(error);

@@ -1,5 +1,6 @@
 const Message = require("../models/message");
 const Converastion = require("../models/conversation");
+const User = require("../models/user");
 
 const createMessage = async (req, res) => {
   const { userId } = req.payload;
@@ -9,8 +10,11 @@ const createMessage = async (req, res) => {
     conversation: req.body.conversationId,
   });
   const conversation = await Converastion.findById(req.body.conversationId);
+  const user = await User.findById(userId);
   conversation.messages.push(message._id);
+  user.messages.push(message._id);
   await conversation.save();
+  await user.save();
   return res.send(message);
 };
 
