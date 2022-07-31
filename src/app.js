@@ -11,6 +11,7 @@ const messageRoute = require("./routes/message");
 const conversationRoute = require("./routes/conversation");
 const commentRoute = require("./routes/comment");
 const followRoute = require("./routes/follow");
+const notificationRoute = require("./routes/notification");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -36,8 +37,10 @@ app.use("/message", messageRoute);
 app.use("/conversation", conversationRoute);
 app.use("/comment", commentRoute);
 app.use("/follow", followRoute);
+app.use("/notification", notificationRoute);
 
 let users = [];
+// let activeConversations = [];
 
 io.on("connection", (socket) => {
   socket.on("userConnect", (data) => {
@@ -72,13 +75,116 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("createMessageNotification", async (data) => {
+    const receiver = users.find((user) => user._id === data.receiver);
+    if (receiver && data) {
+      io.to(receiver.socketId).emit("getNewMessageNotification", data);
+    }
+  });
+
+  socket.on("deleteMessageNotification", async (data) => {
+    const receiver = users.find((user) => user._id === data.receiver);
+    if (receiver && data) {
+      io.to(receiver.socketId).emit("getDeletedMessageNotification", data);
+    }
+  });
+
+  // socket.on("createConversation", async (data) => {
+  //   const receiver = users.find((user) => user._id === data.receiverId);
+  //   const checkConversation = activeConversations.find(
+  //     (conversation) => conversation.conversationId === data.conversationId,
+  //   );
+  //   if (checkConversation) {
+  //     const activeUsersFilter = checkConversation.activeUsers.some(
+  //       (user) => user._id === data.user._id,
+  //     );
+  //     if (!activeUsersFilter) {
+  //       checkConversation.activeUsers.push({
+  //         ...data.user,
+  //         socketId: socket.id,
+  //       });
+  //       if (receiver) {
+  //         io.to(socket.id)
+  //           .to(receiver.socketId)
+  //           .emit("getCurrentConversation", checkConversation.activeUsers);
+  //       } else {
+  //         io.to(socket.id).emit(
+  //           "getCurrentConversation",
+  //           checkConversation.activeUsers,
+  //         );
+  //       }
+  //     } else {
+  //       if (receiver) {
+  //         io.to(socket.id)
+  //           .to(receiver.socketId)
+  //           .emit("getCurrentConversation", checkConversation.activeUsers);
+  //       }
+  //       io.to(socket.id).emit(
+  //         "getCurrentConversation",
+  //         checkConversation.activeUsers,
+  //       );
+  //     }
+  //   } else {
+  //     activeConversations.push({
+  //       conversationId: data.conversationId,
+  //       activeUsers: [data.user],
+  //       socketId: socket.id,
+  //     });
+  //     const getConversation = activeConversations.filter(
+  //       (conversation) => conversation.conversationId === data.conversationId,
+  //     );
+  //     if (receiver) {
+  //       io.to(socket.id)
+  //         .to(receiver.socketId)
+  //         .emit("getCurrentConversation", getConversation.activeUsers);
+  //     } else {
+  //       io.to(socket.id).emit(
+  //         "getCurrentConversation",
+  //         getConversation.activeUsers,
+  //       );
+  //     }
+  //   }
+  // });
+  //
+  // socket.on("closeConversation", async (data) => {
+  //   const receiver = users.find((user) => user._id === data.receiverId);
+  //   let getConversation = activeConversations.find(
+  //     (conversation) => conversation.conversationId === data.conversationId,
+  //   );
+  //
+  //   if (getConversation.activeUsers.length !== 0 && receiver) {
+  //     getConversation = getConversation.activeUsers.filter(
+  //       (user) => user._id !== data.user._id,
+  //     );
+  //
+  //     io.to(receiver.socketId).emit("getCurrentConversation", getConversation);
+  //   } else {
+  //     activeConversations = activeConversations.filter(
+  //       (conversation) => conversation.conversationId !== data.conversationId,
+  //     );
+  //   }
+  // });
+  //
+  // socket.on("createMessageNotification", async (data) => {
+  //   const receiver = users.find((user) => user._id === data.receiverId);
+  //   const checkConversation = activeConversations.find(
+  //     (conversation) => conversation.conversationId === data.conversationId,
+  //   );
+  //
+  //   const activeUsersFilter = checkConversation.activeUsers.some(
+  //     (user) => user._id === data.receiverId,
+  //   );
+  //
+  //   if (receiver && !activeUsersFilter) {
+  //     io.to(receiver.socketId).emit("getCreateMessageNotification", data);
+  //   }
+  // });
+
   socket.on("createComment", async (data) => {
-    // io.to(socket.id).emit("getUserNewComment", data);
     io.emit("getNewComment", data);
   });
 
   socket.on("deleteComment", async (data) => {
-    // io.to(socket.id).emit("getUserNewComment", data);
     io.emit("getDeletedComment", data);
   });
 

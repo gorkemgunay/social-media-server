@@ -57,6 +57,12 @@ const userSchema = mongoose.Schema(
         ref: "User",
       },
     ],
+    notifications: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Notification",
+      },
+    ],
     emailVerifyToken: String,
     passwordResetToken: String,
     refreshToken: {
