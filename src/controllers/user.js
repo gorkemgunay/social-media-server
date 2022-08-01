@@ -137,6 +137,16 @@ const verifyEmail = async (req, res) => {};
 
 const passwordReset = async (req, res) => {};
 
+const updateProfile = async (req, res) => {
+  const { userId } = req.payload;
+
+  await User.findByIdAndUpdate(userId, {
+    biography: req.body.biography,
+  });
+
+  return res.send(true);
+};
+
 module.exports = {
   getUsers,
   getUser,
@@ -147,4 +157,5 @@ module.exports = {
   logout,
   verifyEmail,
   passwordReset,
+  updateProfile,
 };

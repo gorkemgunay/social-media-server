@@ -9,6 +9,15 @@ const getConversation = async (req, res) => {
   return res.send(conversation);
 };
 
+const getUserConversations = async (req, res) => {
+  const { userId } = req.payload;
+  const conversations = await Conversation.find({
+    users: { $in: [userId] },
+  }).populate("users");
+
+  return res.send(conversations);
+};
+
 const createConversation = async (req, res) => {
   const { userId } = req.payload;
   const { receiverId } = req.body;
@@ -31,4 +40,4 @@ const createConversation = async (req, res) => {
   return res.send(conversation);
 };
 
-module.exports = { getConversation, createConversation };
+module.exports = { getConversation, getUserConversations, createConversation };

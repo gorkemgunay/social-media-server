@@ -7,6 +7,7 @@ const {
   logout,
   getUser,
   getUsers,
+  updateProfile,
 } = require("../controllers/user");
 const checkAccessToken = require("../middlewares/checkAccessToken");
 
@@ -19,5 +20,6 @@ router.post("/login", login);
 router.post("/register", register);
 router.post("/refresh-token", refreshToken);
 router.post("/logout", checkAccessToken, logout);
+router.post("/update", checkAccessToken, updateProfile);
 
 module.exports = router;

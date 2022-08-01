@@ -89,6 +89,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("createConversation", async (data) => {
+    const receiver = users.find((user) => user._id === data.receiver);
+    if (receiver) {
+      io.to(receiver.socketId).emit("getConversation", data);
+    }
+  });
+
   // socket.on("createConversation", async (data) => {
   //   const receiver = users.find((user) => user._id === data.receiverId);
   //   const checkConversation = activeConversations.find(
@@ -198,6 +205,10 @@ io.on("connection", (socket) => {
 
   socket.on("unfollowUser", async (data) => {
     io.emit("getUnfollower", data);
+  });
+
+  socket.on("updateBiography", async (data) => {
+    io.emit("getBiography", data);
   });
 
   socket.on("disconnect", () => {
