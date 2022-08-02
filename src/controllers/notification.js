@@ -38,14 +38,21 @@ const createNotification = async (req, res) => {
 const deleteNotification = async (req, res) => {
   const { notificationId } = req.params;
   const { userId } = req.payload;
+  const notification = await Notification.findById(notificationId);
 
-  const notification = await Notification.findByIdAndDelete(notificationId);
+  if (notification.receiver.toString() !== userId) {
+    return res.send("Unauthorized");
+  }
+
+  const deletedNotification = await Notification.findByIdAndDelete(
+    notificationId,
+  );
 
   await User.findByIdAndUpdate(userId, {
     $pull: { notifications: notificationId },
   });
 
-  return res.send(notification);
+  return res.send(deletedNotification);
 };
 
 module.exports = { getNotifications, createNotification, deleteNotification };

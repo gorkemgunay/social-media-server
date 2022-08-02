@@ -1,8 +1,8 @@
+const bcrypt = require("bcrypt");
 const {
   userLoginSchema,
   userRegisterSchema,
 } = require("../validations/schemas");
-const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const {
   verifyRefreshToken,
@@ -72,7 +72,6 @@ const register = async (req, res) => {
       req.body,
       { abortEarly: false },
     );
-    // password hash
     const newUser = await User.create(valideteUserRegisterSchema);
     return res.send(newUser);
   } catch (error) {
@@ -84,6 +83,9 @@ const me = async (req, res) => {
   try {
     const { userId } = req.payload;
     const user = await User.findById(userId).populate("posts");
+    if (user._id.toString() !== userId) {
+      return res.send("Unauthorized");
+    }
     return res.send(user);
   } catch (error) {
     return res.send(error);
@@ -121,6 +123,9 @@ const logout = async (req, res) => {
       if (chechRefreshToken) {
         const { userId } = chechRefreshToken;
         const user = await User.findById(userId).select("+refreshToken");
+        if (user._id.toString() !== userId) {
+          return res.send("Unauthorized");
+        }
         user.refreshToken = null;
         await user.save();
         return res.send(true);

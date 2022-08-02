@@ -24,11 +24,17 @@ const createComment = async (req, res) => {
 const deleteComment = async (req, res) => {
   const { userId } = req.payload;
   const { commentId } = req.params;
-  const comment = await Comment.findByIdAndDelete(commentId);
+  const comment = await Comment.findById(commentId);
+
+  if (comment.user.toString() !== userId) {
+    return res.send("Unauthorized");
+  }
+
+  const deletedComment = await Comment.findByIdAndDelete(commentId);
   await User.findByIdAndUpdate(userId, {
     $pull: { comments: commentId },
   });
-  return res.send(comment);
+  return res.send(deletedComment);
 };
 
 module.exports = { createComment, getPostComments, deleteComment };

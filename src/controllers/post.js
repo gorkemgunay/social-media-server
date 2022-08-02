@@ -5,7 +5,6 @@ const { postSchema, updatePostSchema } = require("../validations/schemas");
 
 const getAllPosts = async (req, res) => {
   const posts = await Post.find({}).populate("user");
-  // .populate({ path: "comments", populate: { path: "user" } });
   return res.send(posts);
 };
 
@@ -54,7 +53,12 @@ const createPost = async (req, res) => {
 
 const updatePost = async (req, res) => {
   try {
+    const { userId } = req.payload;
     const { postId } = req.params;
+    const post = await Post.findById(postId);
+    if (post.user.toString() !== userId) {
+      return res.send("Unauthorized");
+    }
     const validateUpdatePostSchema = await updatePostSchema.validate(req.body);
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
@@ -71,12 +75,17 @@ const deletePost = async (req, res) => {
   try {
     const { userId } = req.payload;
     const { postId } = req.params;
-    const post = await Post.findByIdAndDelete(postId);
+    const post = await Post.findById(postId);
+    if (post.user.toString() !== userId) {
+      return res.send("unauthorized");
+    }
+
+    const deletedPost = await Post.findByIdAndDelete(postId);
     await Comment.deleteMany({ post: postId });
     await User.findByIdAndUpdate(userId, {
       $pull: { posts: postId },
     });
-    return res.send(post);
+    return res.send(deletedPost);
   } catch (error) {
     return res.send(error);
   }
