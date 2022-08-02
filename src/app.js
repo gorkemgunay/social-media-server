@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
+const helmet = require("helmet");
 const { Server } = require("socket.io");
 const mongoose = require("mongoose");
 const uri = require("./config/db");
@@ -23,6 +24,7 @@ const io = new Server(httpServer, {
 });
 
 app.use(express.json());
+app.use(helmet());
 
 app.use(
   cors({
