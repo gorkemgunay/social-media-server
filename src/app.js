@@ -209,8 +209,15 @@ io.on("connection", (socket) => {
     io.emit("getUnfollower", data);
   });
 
-  socket.on("updateBiography", async (data) => {
-    io.emit("getBiography", data);
+  socket.on("updateProfileSettings", async (data) => {
+    users = users.map((user) => {
+      if (user._id === data.profileId) {
+        return { ...user, name: data.name, surname: data.surname };
+      }
+      return user;
+    });
+    io.emit("getNewProfileSettings", data);
+    io.emit("getOnlineUsers", users);
   });
 
   socket.on("disconnect", () => {

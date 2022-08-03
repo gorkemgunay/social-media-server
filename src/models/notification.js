@@ -14,6 +14,10 @@ const notificationSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    relatedId: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

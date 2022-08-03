@@ -146,6 +146,8 @@ const updateProfile = async (req, res) => {
   const { userId } = req.payload;
 
   await User.findByIdAndUpdate(userId, {
+    name: req.body.name,
+    surname: req.body.surname,
     biography: req.body.biography,
   });
 

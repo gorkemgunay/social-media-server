@@ -16,6 +16,7 @@ const createNotification = async (req, res) => {
     type: req.body.type,
     receiver: req.body.receiverId,
     sender: userId,
+    relatedId: req.body.relatedId,
   });
 
   if (!checkNotification) {
@@ -23,6 +24,7 @@ const createNotification = async (req, res) => {
       type: req.body.type,
       receiver: req.body.receiverId,
       sender: userId,
+      relatedId: req.body.relatedId,
     });
 
     const user = await User.findById(req.body.receiverId);
@@ -40,8 +42,12 @@ const deleteNotification = async (req, res) => {
   const { userId } = req.payload;
   const notification = await Notification.findById(notificationId);
 
-  if (notification.receiver.toString() !== userId) {
-    return res.send("Unauthorized");
+  if (notification) {
+    if (notification.receiver.toString() !== userId) {
+      return res.send("Unauthorized");
+    }
+  } else {
+    return res.send("Error");
   }
 
   const deletedNotification = await Notification.findByIdAndDelete(
