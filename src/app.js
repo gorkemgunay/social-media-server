@@ -91,103 +91,21 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("createGroupMessage", async (data) => {
+    if (data.receiversIds) {
+      const ids = data.receiversIds.map((r) => r.socketId);
+      io.to(socket.id).to(ids).emit("getNewMessage", data);
+    } else {
+      io.to(socket.id).emit("getNewMessage", data);
+    }
+  });
+
   socket.on("createConversation", async (data) => {
     const receiver = users.find((user) => user._id === data.receiver);
     if (receiver) {
       io.to(receiver.socketId).emit("getConversation", data);
     }
   });
-
-  // socket.on("createConversation", async (data) => {
-  //   const receiver = users.find((user) => user._id === data.receiverId);
-  //   const checkConversation = activeConversations.find(
-  //     (conversation) => conversation.conversationId === data.conversationId,
-  //   );
-  //   if (checkConversation) {
-  //     const activeUsersFilter = checkConversation.activeUsers.some(
-  //       (user) => user._id === data.user._id,
-  //     );
-  //     if (!activeUsersFilter) {
-  //       checkConversation.activeUsers.push({
-  //         ...data.user,
-  //         socketId: socket.id,
-  //       });
-  //       if (receiver) {
-  //         io.to(socket.id)
-  //           .to(receiver.socketId)
-  //           .emit("getCurrentConversation", checkConversation.activeUsers);
-  //       } else {
-  //         io.to(socket.id).emit(
-  //           "getCurrentConversation",
-  //           checkConversation.activeUsers,
-  //         );
-  //       }
-  //     } else {
-  //       if (receiver) {
-  //         io.to(socket.id)
-  //           .to(receiver.socketId)
-  //           .emit("getCurrentConversation", checkConversation.activeUsers);
-  //       }
-  //       io.to(socket.id).emit(
-  //         "getCurrentConversation",
-  //         checkConversation.activeUsers,
-  //       );
-  //     }
-  //   } else {
-  //     activeConversations.push({
-  //       conversationId: data.conversationId,
-  //       activeUsers: [data.user],
-  //       socketId: socket.id,
-  //     });
-  //     const getConversation = activeConversations.filter(
-  //       (conversation) => conversation.conversationId === data.conversationId,
-  //     );
-  //     if (receiver) {
-  //       io.to(socket.id)
-  //         .to(receiver.socketId)
-  //         .emit("getCurrentConversation", getConversation.activeUsers);
-  //     } else {
-  //       io.to(socket.id).emit(
-  //         "getCurrentConversation",
-  //         getConversation.activeUsers,
-  //       );
-  //     }
-  //   }
-  // });
-  //
-  // socket.on("closeConversation", async (data) => {
-  //   const receiver = users.find((user) => user._id === data.receiverId);
-  //   let getConversation = activeConversations.find(
-  //     (conversation) => conversation.conversationId === data.conversationId,
-  //   );
-  //
-  //   if (getConversation.activeUsers.length !== 0 && receiver) {
-  //     getConversation = getConversation.activeUsers.filter(
-  //       (user) => user._id !== data.user._id,
-  //     );
-  //
-  //     io.to(receiver.socketId).emit("getCurrentConversation", getConversation);
-  //   } else {
-  //     activeConversations = activeConversations.filter(
-  //       (conversation) => conversation.conversationId !== data.conversationId,
-  //     );
-  //   }
-  // });
-  //
-  // socket.on("createMessageNotification", async (data) => {
-  //   const receiver = users.find((user) => user._id === data.receiverId);
-  //   const checkConversation = activeConversations.find(
-  //     (conversation) => conversation.conversationId === data.conversationId,
-  //   );
-  //
-  //   const activeUsersFilter = checkConversation.activeUsers.some(
-  //     (user) => user._id === data.receiverId,
-  //   );
-  //
-  //   if (receiver && !activeUsersFilter) {
-  //     io.to(receiver.socketId).emit("getCreateMessageNotification", data);
-  //   }
-  // });
 
   socket.on("createComment", async (data) => {
     io.emit("getNewComment", data);

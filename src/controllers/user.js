@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const {
   userLoginSchema,
   userRegisterSchema,
+  resetPasswordSchema,
 } = require("../validations/schemas");
 const User = require("../models/user");
 const {
@@ -140,7 +141,32 @@ const logout = async (req, res) => {
 
 const verifyEmail = async (req, res) => {};
 
-const passwordReset = async (req, res) => {};
+const resetPassword = async (req, res) => {
+  const { userId } = req.payload;
+  const valideteResetPasswordSchema = await resetPasswordSchema.validate(
+    req.body,
+    { abortEarly: false },
+  );
+
+  const user = await User.findById(userId).select("+password");
+
+  const checkPassword = await bcrypt.compare(
+    valideteResetPasswordSchema.password,
+    user.password,
+  );
+
+  if (checkPassword) {
+    const newPassword = await bcrypt.hash(
+      valideteResetPasswordSchema.newPassword,
+      12,
+    );
+    user.password = newPassword;
+    await user.save();
+    return res.send(true);
+  }
+
+  return res.send({ error: "Password is wrong" });
+};
 
 const updateProfile = async (req, res) => {
   const { userId } = req.payload;
@@ -163,6 +189,6 @@ module.exports = {
   refreshToken,
   logout,
   verifyEmail,
-  passwordReset,
+  resetPassword,
   updateProfile,
 };

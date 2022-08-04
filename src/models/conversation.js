@@ -14,6 +14,10 @@ const conversationSchema = mongoose.Schema(
         ref: "User",
       },
     ],
+    group: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );

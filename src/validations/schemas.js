@@ -1,4 +1,4 @@
-const { object, string } = require("yup");
+const { object, string, ref } = require("yup");
 
 const postSchema = object({
   title: string().min(6).required(),
@@ -22,9 +22,19 @@ const userRegisterSchema = object({
   password: string().min(6).required(),
 });
 
+const resetPasswordSchema = object({
+  password: string().min(6).required(),
+  newPassword: string().min(6).required(),
+  newPasswordConfirm: string()
+    .min(6)
+    .oneOf([ref("newPassword"), null], "Passwords must match")
+    .required(),
+});
+
 module.exports = {
   postSchema,
   updatePostSchema,
   userLoginSchema,
   userRegisterSchema,
+  resetPasswordSchema,
 };
