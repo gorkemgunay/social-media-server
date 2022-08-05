@@ -69,9 +69,9 @@ io.on("connection", (socket) => {
   });
 
   socket.on("createMessage", async (data) => {
-    const receiver = users.find((user) => user._id === data.receiverId);
-    if (receiver) {
-      io.to(socket.id).to(receiver.socketId).emit("getNewMessage", data);
+    if (data.receiversIds) {
+      const ids = data.receiversIds.map((r) => r.socketId);
+      io.to(socket.id).to(ids).emit("getNewMessage", data);
     } else {
       io.to(socket.id).emit("getNewMessage", data);
     }
@@ -88,15 +88,6 @@ io.on("connection", (socket) => {
     const receiver = users.find((user) => user._id === data.receiver);
     if (receiver && data) {
       io.to(receiver.socketId).emit("getDeletedMessageNotification", data);
-    }
-  });
-
-  socket.on("createGroupMessage", async (data) => {
-    if (data.receiversIds) {
-      const ids = data.receiversIds.map((r) => r.socketId);
-      io.to(socket.id).to(ids).emit("getNewMessage", data);
-    } else {
-      io.to(socket.id).emit("getNewMessage", data);
     }
   });
 
