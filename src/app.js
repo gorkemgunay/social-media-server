@@ -13,6 +13,7 @@ const conversationRoute = require("./routes/conversation");
 const commentRoute = require("./routes/comment");
 const followRoute = require("./routes/follow");
 const notificationRoute = require("./routes/notification");
+const likeRoute = require("./routes/like");
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -40,6 +41,7 @@ app.use("/conversation", conversationRoute);
 app.use("/comment", commentRoute);
 app.use("/follow", followRoute);
 app.use("/notification", notificationRoute);
+app.use("/like", likeRoute);
 
 let users = [];
 // let activeConversations = [];
@@ -104,6 +106,14 @@ io.on("connection", (socket) => {
 
   socket.on("deleteComment", async (data) => {
     io.emit("getDeletedComment", data);
+  });
+
+  socket.on("createLike", async (data) => {
+    io.emit("getNewLike", data);
+  });
+
+  socket.on("deleteLike", async (data) => {
+    io.emit("getDeletedLike", data);
   });
 
   socket.on("registeredUser", async (data) => {

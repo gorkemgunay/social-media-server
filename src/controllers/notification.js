@@ -54,9 +54,13 @@ const deleteNotification = async (req, res) => {
     notificationId,
   );
 
-  await User.findByIdAndUpdate(userId, {
-    $pull: { notifications: notificationId },
-  });
+  await User.findByIdAndUpdate(
+    userId,
+    {
+      $pull: { notifications: notificationId },
+    },
+    { new: true },
+  );
 
   return res.send(deletedNotification);
 };

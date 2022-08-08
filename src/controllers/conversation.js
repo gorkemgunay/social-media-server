@@ -94,7 +94,7 @@ const createGroupConversation = async (req, res) => {
 const addUserToGroupConversation = async (req, res) => {
   const { userId } = req.payload;
   const { conversationId } = req.params;
-  // const { receiversIds } = req.body;
+  const { receiversIds } = req.body;
 
   const findGroupConversation = await Conversation.findOne({
     _id: conversationId,
@@ -106,8 +106,22 @@ const addUserToGroupConversation = async (req, res) => {
     return res.send("Unauthorized.");
   }
 
-  // if (receiversIds) {
-  // }
+  if (receiversIds) {
+    receiversIds.map(async (r) => {
+      const checkIfUserExist = findGroupConversation.users.some(
+        (u) => u.toString() === r,
+      );
+      if (!checkIfUserExist) {
+        findGroupConversation.users.push(r);
+        const user = await User.findById(r);
+        user.conversations.push(conversationId);
+        await findGroupConversation.save();
+        await user.save();
+      }
+    });
+
+    return res.send(findGroupConversation);
+  }
 
   return res.send("Error");
 };
