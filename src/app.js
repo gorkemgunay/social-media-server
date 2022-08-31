@@ -44,7 +44,6 @@ app.use("/notification", notificationRoute);
 app.use("/like", likeRoute);
 
 let users = [];
-// let activeConversations = [];
 
 io.on("connection", (socket) => {
   socket.on("userConnect", (data) => {
