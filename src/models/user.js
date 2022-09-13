@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-// add notification array
-
 const userSchema = mongoose.Schema(
   {
     name: {

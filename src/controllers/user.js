@@ -96,9 +96,9 @@ const me = async (req, res) => {
 const refreshToken = async (req, res) => {
   try {
     if (req.body.refreshToken) {
-      const chechRefreshToken = verifyRefreshToken(req.body.refreshToken);
-      if (chechRefreshToken) {
-        const { userId } = chechRefreshToken;
+      const checkRefreshToken = verifyRefreshToken(req.body.refreshToken);
+      if (checkRefreshToken) {
+        const { userId } = checkRefreshToken;
         const user = await User.findById(userId).select("+refreshToken");
         const newAccessToken = createAccessToken(userId);
         const newRefreshToken = createRefreshToken(userId);
@@ -120,9 +120,9 @@ const refreshToken = async (req, res) => {
 const logout = async (req, res) => {
   try {
     if (req.body.refreshToken) {
-      const chechRefreshToken = verifyRefreshToken(req.body.refreshToken);
-      if (chechRefreshToken) {
-        const { userId } = chechRefreshToken;
+      const checkRefreshToken = verifyRefreshToken(req.body.refreshToken);
+      if (checkRefreshToken) {
+        const { userId } = checkRefreshToken;
         const user = await User.findById(userId).select("+refreshToken");
         if (user._id.toString() !== userId) {
           return res.send("Unauthorized");
@@ -139,11 +139,9 @@ const logout = async (req, res) => {
   }
 };
 
-const verifyEmail = async (req, res) => {};
-
 const resetPassword = async (req, res) => {
   const { userId } = req.payload;
-  const valideteResetPasswordSchema = await resetPasswordSchema.validate(
+  const validateResetPasswordSchema = await resetPasswordSchema.validate(
     req.body,
     { abortEarly: false },
   );
@@ -151,13 +149,13 @@ const resetPassword = async (req, res) => {
   const user = await User.findById(userId).select("+password");
 
   const checkPassword = await bcrypt.compare(
-    valideteResetPasswordSchema.password,
+    validateResetPasswordSchema.password,
     user.password,
   );
 
   if (checkPassword) {
     const newPassword = await bcrypt.hash(
-      valideteResetPasswordSchema.newPassword,
+      validateResetPasswordSchema.newPassword,
       12,
     );
     user.password = newPassword;
@@ -188,7 +186,6 @@ module.exports = {
   me,
   refreshToken,
   logout,
-  verifyEmail,
   resetPassword,
   updateProfile,
 };
